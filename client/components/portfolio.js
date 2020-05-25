@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import axios from 'axios'
+import {Card} from 'react-bootstrap'
 
 export default class Portfolio extends Component {
   constructor() {
@@ -64,31 +65,32 @@ export default class Portfolio extends Component {
     return (
       <div>
         <div className="content-container">
-          <h2 className="left">Portfolio ($3003.01)</h2>
-          <h2 className="right">Cash - $5000</h2>
-          <h2 className="right">Search Ticker</h2>
-        </div>
-        <div className="content-container">
           <div className="left">
-            <div className="stock">
-              <p>APPL - 5 shares</p>
-              <p>$300.01</p>
-            </div>
-            <div className="stock">
-              <p>APPL - 5 shares</p>
-              <p>$300.01</p>
-            </div>
-            <div className="stock">
-              <p>APPL - 5 shares</p>
-              <p>$300.01</p>
-            </div>
-            <div className="stock">
-              <p>APPL - 5 shares</p>
-              <p>$300.01</p>
-            </div>
+            <h2>Portfolio ($3003.01)</h2>
+            <Card className="stock">
+              <Card.Body>
+                <Card.Title>AAPL - 5 shares @ $300.01 </Card.Title>
+              </Card.Body>
+            </Card>
+            <Card className="stock">
+              <Card.Body>
+                <Card.Title>AAPL - 5 shares @ $300.01 </Card.Title>
+              </Card.Body>
+            </Card>
+            <Card className="stock">
+              <Card.Body>
+                <Card.Title>AAPL - 5 shares @ $300.01 </Card.Title>
+              </Card.Body>
+            </Card>
+            <Card className="stock">
+              <Card.Body>
+                <Card.Title>AAPL - 5 shares @ $300.01 </Card.Title>
+              </Card.Body>
+            </Card>
           </div>
           <div className="vert-line" />
           <div className="right">
+            <h2>Cash - $5000</h2>
             <div className="input-container">
               <input className="search-input" placeholder="TICKER" />
               <input className="quantity" placeholder="QTY" />
@@ -99,6 +101,7 @@ export default class Portfolio extends Component {
           </div>
           <div className="vert-line" />
           <div className="right">
+            <h2>Search Ticker</h2>
             <div className="input-container">
               <input
                 className="search-input"
