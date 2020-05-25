@@ -1,8 +1,10 @@
 const router = require('express').Router()
 const {User} = require('../db/models')
+const {isUser, isAdmin, isCorrectUserOrAdmin} = require('./utils')
 module.exports = router
 
-router.get('/', async (req, res, next) => {
+// Get all users only if user is an admin
+router.get('/', isAdmin, async (req, res, next) => {
   try {
     const users = await User.findAll({
       // explicitly select only the id and email fields - even though
@@ -13,5 +15,54 @@ router.get('/', async (req, res, next) => {
     res.json(users)
   } catch (err) {
     next(err)
+  }
+})
+
+// get individual user
+router.get('/:id', isAdmin, async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.params.id)
+    console.log(user)
+    res.json(user)
+  } catch (error) {
+    next(error)
+  }
+})
+
+// create user
+router.post('/', async (req, res, next) => {
+  try {
+    const createdUser = await User.create(req.body)
+    res.json(createdUser)
+  } catch (error) {
+    next(error)
+  }
+})
+
+// Edit user by id
+router.put('/:userId', async (req, res, next) => {
+  console.log('req.body', req.body)
+  try {
+    await User.update(
+      {email: req.body.email},
+      {
+        where: {
+          id: req.params.userId
+        }
+      }
+    )
+    res.sendStatus(201)
+  } catch (error) {
+    next(error)
+  }
+})
+
+// delete user only if correct user or admin
+router.delete('/', isCorrectUserOrAdmin, async (req, res, next) => {
+  try {
+    const destroyedUser = await User.destroy(req.body)
+    res.json(destroyedUser)
+  } catch (error) {
+    next(error)
   }
 })
