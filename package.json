@@ -1,7 +1,6 @@
 {
-  "name": "boilermaker",
+  "name": "my-stock-portfolio",
   "version": "2.0.0",
-  "description": "Some boilerplate code to get you started - get shakin'!",
   "engines": {
     "node": "~12.11.1"
   },
@@ -85,7 +84,6 @@
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.12.1",
     "eslint": "^5.16.0",
-    "eslint-config-fullstack": "^6.0.0",
     "eslint-config-prettier": "^4.1.0",
     "eslint-plugin-react": "^7.12.4",
     "git-url-parse": "^11.1.2",
