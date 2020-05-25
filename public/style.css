@@ -9,6 +9,13 @@ label {
 nav a {
   display: inline-block;
   margin: 1em;
+  color: #000;
+}
+
+nav a:hover {
+  font-weight: bold;
+  color: #000;
+  transition: 0.05s;
 }
 
 form div {
@@ -116,5 +123,5 @@ h2 {
 
 .trx-card {
   width: 200px;
-  margin: 10px 20px;
+  margin: 10px 10px;
 }
