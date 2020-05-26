@@ -39,9 +39,10 @@ export const getTransactionsThunk = () => {
 export const purchaseStockThunk = (userId, price, ticker, shares) => {
   return async dispatch => {
     try {
+      const date = new Date()
       const purchaseInfo = {
         id: userId,
-        purchaseDate: Date(Date.now()),
+        purchaseDate: date,
         price,
         ticker,
         shares,

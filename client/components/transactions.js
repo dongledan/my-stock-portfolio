@@ -12,37 +12,27 @@ class Transactions extends Component {
   }
   render() {
     const {trxHistory} = this.props
-    console.log(this.props, 'hi')
     return (
       <div>
         <h2>Transactions</h2>
         <div className="transactions-container">
           <div className="row">
-            <Card className="trx-card">
-              <Card.Body>
-                <Card.Title>(BUY) AAPL - 5 shares @ $300.01 </Card.Title>
-              </Card.Body>
-            </Card>
-            <Card className="trx-card">
-              <Card.Body>
-                <Card.Title>(BUY) AAPL - 5 shares @ $300.01 </Card.Title>
-              </Card.Body>
-            </Card>
-            <Card className="trx-card">
-              <Card.Body>
-                <Card.Title>(BUY) AAPL - 5 shares @ $300.01 </Card.Title>
-              </Card.Body>
-            </Card>
-            <Card className="trx-card">
-              <Card.Body>
-                <Card.Title>(BUY) AAPL - 5 shares @ $300.01 </Card.Title>
-              </Card.Body>
-            </Card>
-            <Card className="trx-card">
-              <Card.Body>
-                <Card.Title>(SELL) AAPL - 5 shares @ $300.01 </Card.Title>
-              </Card.Body>
-            </Card>
+            {trxHistory && trxHistory.length > 0 ? (
+              trxHistory.map((trx, i) => (
+                <Card className="trx-card" key={i}>
+                  <Card.Body>
+                    <Card.Title>
+                      ({trx.action}) {trx.ticker} - {trx.shares} shares @ ${
+                        trx.price
+                      }{' '}
+                    </Card.Title>
+                    <Card.Subtitle>{trx.purchaseDate}</Card.Subtitle>
+                  </Card.Body>
+                </Card>
+              ))
+            ) : (
+              <h2>You do not have any transactions.</h2>
+            )}
           </div>
         </div>
       </div>
@@ -52,7 +42,7 @@ class Transactions extends Component {
 
 const mapStateToProps = state => {
   return {
-    trxHistory: state.trxHistory
+    trxHistory: state.transactions.trxHistory
   }
 }
 
