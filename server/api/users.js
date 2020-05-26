@@ -10,7 +10,7 @@ router.get('/', isAdmin, async (req, res, next) => {
       // explicitly select only the id and email fields - even though
       // users' passwords are encrypted, it won't help if we just
       // send everything to anyone who asks!
-      attributes: ['id', 'email']
+      attributes: ['id', 'email', 'name']
     })
     res.json(users)
   } catch (err) {
@@ -24,34 +24,6 @@ router.get('/:id', isAdmin, async (req, res, next) => {
     const user = await User.findByPk(req.params.id)
     console.log(user)
     res.json(user)
-  } catch (error) {
-    next(error)
-  }
-})
-
-// create user
-router.post('/', async (req, res, next) => {
-  try {
-    const createdUser = await User.create(req.body)
-    res.json(createdUser)
-  } catch (error) {
-    next(error)
-  }
-})
-
-// Edit user by id
-router.put('/:userId', async (req, res, next) => {
-  console.log('req.body', req.body)
-  try {
-    await User.update(
-      {email: req.body.email},
-      {
-        where: {
-          id: req.params.userId
-        }
-      }
-    )
-    res.sendStatus(201)
   } catch (error) {
     next(error)
   }
