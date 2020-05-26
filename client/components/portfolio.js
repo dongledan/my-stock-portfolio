@@ -13,13 +13,24 @@ class Portfolio extends Component {
       value: '',
       stocks: [],
       ticker: '',
-      shares: 0
+      shares: 0,
+      stock: [],
+      update: false
     }
     this.handleClick = this.handleClick.bind(this)
     this.handleInput = this.handleInput.bind(this)
+    this.handleChange = this.handleChange.bind(this)
   }
+
   componentDidMount() {
     this.props.getPortfolio()
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.update) {
+      this.props.getPortfolio()
+      this.setState({update: false})
+    }
   }
 
   handleInput(e) {
@@ -33,6 +44,7 @@ class Portfolio extends Component {
       value: e.target.value
     })
     const {value} = this.state
+    // multiple keys to limit running into max API calls
     const key = [
       '1NPRUSRW9SUDESWQ',
       'OTF3Q8BLOVNOFA0A',
@@ -58,7 +70,8 @@ class Portfolio extends Component {
   }
 
   async handleClick() {
-    const {shares, ticker} = this.state
+    this.setState({update: true})
+    const {shares, ticker, stock} = this.state
     if (ticker.length < 1 || shares <= 0) {
       alert('Please enter valid ticker and/or purchase 1 or more shares.')
       return
@@ -68,23 +81,24 @@ class Portfolio extends Component {
         keys[rdmIdx]
       }`
       const {data} = await axios.get(url)
-      if (data) {
-        const price = parseFloat(data['Global Quote']['05. price']) * 100
-        console.log(this.props.user.id, price, ticker, shares)
+      const price =
+        parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
+      if (price) {
         this.props.purchaseStock(this.props.user.id, price, ticker, shares)
+        alert('Bought!')
       } else alert('Please enter valid ticker.')
     }
     this.props.getPortfolio()
   }
 
   render() {
-    const {stocks, value, shares, ticker} = this.state
+    const {stocks, value, shares, ticker, price} = this.state
     const {user, portfolio} = this.props
     return (
       <div>
         <div className="content-container">
           <div className="left">
-            <h2>Portfolio ($3003.01)</h2>
+            <h2>Portfolio ( - )</h2>
             {portfolio && portfolio.length > 0 ? (
               portfolio.map((stock, i) => (
                 <Card className="stock" key={i}>
@@ -106,7 +120,7 @@ class Portfolio extends Component {
                         <Card.Title>{stock.ticker}</Card.Title>
                         <Card.Subtitle>{stock.shares} shares</Card.Subtitle>
                       </div>
-                      <Card.Title>$300.01</Card.Title>
+                      <Card.Title>$ - </Card.Title>
                     </div>
                   </Card.Body>
                 </Card>
@@ -147,6 +161,7 @@ class Portfolio extends Component {
               <input
                 className="search-input"
                 placeholder="TICKER"
+                value={value}
                 onChange={this.handleChange}
               />
               {stocks && stocks.length > 0 ? (

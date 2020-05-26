@@ -10,7 +10,13 @@ const AuthForm = props => {
   const {name, displayName, handleSubmit, error} = props
 
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexDirection: 'column'
+      }}
+    >
       <form onSubmit={handleSubmit} name={name}>
         {name === 'signup' ? (
           <div>
