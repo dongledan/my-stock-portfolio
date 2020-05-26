@@ -10,9 +10,9 @@ const EMPTY_PORTFOLIO = 'EMPTY_PORTFOLIO'
 const defaultPort = []
 
 //ACTION CREATORS
-export const getCart = portfolio => ({type: GET_PORTFOLIO, portfolio})
-export const emptyCart = () => ({type: EMPTY_PORTFOLIO, portfolio: []})
-export const removeItem = portfolio => ({type: REMOVE_STOCK, portfolio})
+export const getPort = portfolio => ({type: GET_PORTFOLIO, portfolio})
+export const emptyPort = () => ({type: EMPTY_PORTFOLIO, portfolio: []})
+export const removeStock = portfolio => ({type: REMOVE_STOCK, portfolio})
 export const addStock = stock => ({type: ADD_STOCK, stock})
 
 //THUNK CREATORS
