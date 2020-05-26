@@ -37,7 +37,7 @@ const User = db.define('user', {
   balance: {
     type: Sequelize.INTEGER,
     allowNull: false,
-    defaultValue: 5000
+    defaultValue: 500000
   },
   googleId: {
     type: Sequelize.STRING

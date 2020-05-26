@@ -22,9 +22,8 @@ class Transactions extends Component {
                 <Card className="trx-card" key={i}>
                   <Card.Body>
                     <Card.Title>
-                      ({trx.action}) {trx.ticker} - {trx.shares} shares @ ${
-                        trx.price
-                      }{' '}
+                      ({trx.action}) {trx.ticker} - {trx.shares} shares @ ${trx.price /
+                        100}{' '}
                     </Card.Title>
                     <Card.Subtitle>{trx.purchaseDate}</Card.Subtitle>
                   </Card.Body>

@@ -23,7 +23,7 @@ router.post('/', async (req, res, next) => {
   try {
     const userId = req.user.id
     const {purchaseDate, price, shares, action, ticker} = req.body
-    await Transaction.create({
+    const data = await Transaction.create({
       userId,
       purchaseDate,
       price,
@@ -31,7 +31,7 @@ router.post('/', async (req, res, next) => {
       action,
       ticker
     })
-    res.sendStatus(201)
+    res.json(data)
   } catch (error) {
     next(error)
   }
