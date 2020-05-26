@@ -4,23 +4,41 @@ const {isUser, isAdmin, isCorrectUserOrAdmin} = require('./utils')
 module.exports = router
 
 // find transactions by user
-router.get('/:id', isAdmin, async (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   try {
-    const portfolio = await Transaction.findAll()
-    res.json(portfolio)
+    const userId = req.user.id
+    const transactions = await Transaction.findAll({
+      where: {
+        userId
+      }
+    })
+    res.json(transactions)
   } catch (err) {
     next(err)
   }
 })
 
-// add stock
+// add transactions
 router.post('/', async (req, res, next) => {
   try {
-    const ticker = req.body.ticker
-    const shares = req.body.shares
-    const userId = req.body.id
-    const addStock = await Portfolio.create({ticker, shares, userId})
-    res.json(addStock)
+    const userId = req.user.id
+    const {purchaseDate, price, shares, action, ticker} = req.body
+    await Transaction.create(
+      {
+        purchaseDate,
+        price,
+        shares,
+        action,
+        ticker
+      },
+      {
+        where: {
+          userId
+        }
+      }
+    )
+
+    res.sendStatus(201)
   } catch (error) {
     next(error)
   }

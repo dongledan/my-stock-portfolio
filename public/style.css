@@ -10,12 +10,14 @@ nav a {
   display: inline-block;
   margin: 1em;
   color: #000;
+  letter-spacing: 2px;
 }
 
 nav a:hover {
   font-weight: bold;
   color: #000;
   transition: 0.05s;
+  letter-spacing: 1.3px;
 }
 
 form div {
