@@ -1,17 +1,26 @@
 import React, {Component} from 'react'
+import {connect} from 'react-redux'
 import axios from 'axios'
 import {Card} from 'react-bootstrap'
+import {purchaseStockThunk} from '../store'
 
-export default class Portfolio extends Component {
+class Portfolio extends Component {
   constructor() {
     super()
     this.state = {
       value: '',
       stocks: [],
-      ticker: ''
+      ticker: '',
+      shares: 0
     }
     this.handleClick = this.handleClick.bind(this)
-    this.handleChange = this.handleChange.bind(this)
+    this.handleInput = this.handleInput.bind(this)
+  }
+
+  handleInput(e) {
+    let {value, name} = e.target
+    if (name === 'ticker') value = value.toUpperCase()
+    this.setState({[name]: value})
   }
 
   async handleChange(e) {
@@ -43,25 +52,14 @@ export default class Portfolio extends Component {
     }
   }
 
-  async handleClick(e) {
-    if (e) e.preventDefault()
-    this.setState({
-      value: '',
-      ticker: this.state.value
-    })
-    const ticker = this.state.value.toUpperCase()
-    const key = '1NPRUSRW9SUDESWQ'
-    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${key}`
-    try {
-      const {data} = await axios.get(url)
-      console.log(data)
-    } catch (error) {
-      console.err(error)
-    }
+  async handleClick() {
+    const price = 200
+    const {shares, ticker} = this.state
+    await this.props.purchaseStock(this.props.user.id, price, ticker, shares)
   }
 
   render() {
-    const {stocks} = this.state
+    const {stocks, value, shares, ticker} = this.state
     return (
       <div>
         <div className="content-container">
@@ -92,8 +90,22 @@ export default class Portfolio extends Component {
           <div className="right">
             <h2>Cash - $5000</h2>
             <div className="input-container">
-              <input className="search-input" placeholder="TICKER" />
-              <input className="quantity" placeholder="QTY" />
+              <input
+                className="search-input"
+                name="ticker"
+                type="text"
+                value={ticker}
+                placeholder="TICKER"
+                onChange={this.handleInput}
+              />
+              <input
+                className="quantity"
+                name="shares"
+                type="number"
+                value={shares === 0 ? '' : shares}
+                placeholder="QTY"
+                onChange={this.handleInput}
+              />
               <button type="submit" onClick={this.handleClick}>
                 Buy
               </button>
@@ -133,3 +145,20 @@ export default class Portfolio extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    user: state.user,
+    transactions: state.transactions
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    purchaseStock: (userId, price, ticker, shares) => {
+      dispatch(purchaseStockThunk(userId, price, ticker, shares))
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Portfolio)
