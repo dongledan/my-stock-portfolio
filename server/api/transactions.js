@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const {Transaction} = require('../db/models')
+const {Transaction, User} = require('../db/models')
 const {isUser, isAdmin, isCorrectUserOrAdmin} = require('./utils')
 module.exports = router
 
@@ -31,6 +31,12 @@ router.post('/', async (req, res, next) => {
       action,
       ticker
     })
+    const user = await User.findOne({
+      where: {
+        id: userId
+      }
+    })
+    if (user) await user.decrement({balance: price * shares})
     res.json(data)
   } catch (error) {
     next(error)

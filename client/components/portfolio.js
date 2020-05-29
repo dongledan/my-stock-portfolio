@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import axios from 'axios'
 import {Card} from 'react-bootstrap'
-import {purchaseStockThunk, getPortThunk} from '../store'
+import {purchaseStockThunk, getPortThunk, me} from '../store'
 
 import {keys} from '../../public/constants'
 
@@ -89,6 +89,7 @@ class Portfolio extends Component {
       } else alert('Please enter valid ticker.')
     }
     this.props.getPortfolio()
+    this.props.getUser()
   }
 
   render() {
@@ -205,6 +206,9 @@ const mapDispatchToProps = dispatch => {
     },
     getPortfolio: () => {
       dispatch(getPortThunk())
+    },
+    getUser: () => {
+      dispatch(me())
     }
   }
 }
