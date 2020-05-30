@@ -14,8 +14,9 @@ class Portfolio extends Component {
       stocks: [],
       ticker: '',
       shares: 0,
-      stock: [],
-      update: false
+      update: false,
+      portfolio: {},
+      portfolioVal: 0
     }
     this.handleClick = this.handleClick.bind(this)
     this.handleInput = this.handleInput.bind(this)
@@ -24,11 +25,18 @@ class Portfolio extends Component {
 
   componentDidMount() {
     this.props.getPortfolio()
+    this.props.getUser()
+    // this.setState({portfolio: this.props.portfolio})
+    // const portfolioVal = 0;
+    // this.props.portfolio.map((stock, i) => (
+
+    // ))
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.update) {
       this.props.getPortfolio()
+      this.props.getUser()
       this.setState({update: false})
     }
   }
@@ -40,26 +48,14 @@ class Portfolio extends Component {
   }
 
   async handleChange(e) {
+    const {value} = e.target
     this.setState({
-      value: e.target.value
+      value: value.toUpperCase()
     })
-    const {value} = this.state
-    // multiple keys to limit running into max API calls
-    const key = [
-      '1NPRUSRW9SUDESWQ',
-      'OTF3Q8BLOVNOFA0A',
-      '8Q133ANRR1SAMC72',
-      '5C7VFB9FRAI8BJ3A',
-      'R0C510MH6QVXW6U6',
-      'GXQSJYQV0HUC8K36',
-      'PQEC9C7770HVOE2N',
-      'RTWOC6TOAJZ0V4IK',
-      'FSTBF9VCIJBINAW4',
-      'V8IF0IE0PXKD2RCI'
-    ]
-    const rdmIdx = parseInt(Math.random() * 10)
+    // multiple api keys to avoid hitting API call limit (5 per minute)
+    const rdmIdx = Math.floor(Math.random() * 10)
     const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${value}&apikey=${
-      key[rdmIdx]
+      keys[rdmIdx]
     }`
     try {
       const {data} = await axios.get(url)
@@ -70,26 +66,47 @@ class Portfolio extends Component {
   }
 
   async handleClick() {
-    this.setState({update: true})
     const {shares, ticker, stock} = this.state
     if (ticker.length < 1 || shares <= 0) {
       alert('Please enter valid ticker and/or purchase 1 or more shares.')
       return
     } else {
-      const rdmIdx = parseInt(Math.random() * 10)
+      // multiple api keys to avoid hitting API call limit (5 per minute)
+      const rdmIdx = Math.floor(Math.random() * 10)
       const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${
         keys[rdmIdx]
       }`
       const {data} = await axios.get(url)
-      const price =
-        parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
+
+      // data structure data {Global Quote {01. symbol, 02. open, 03. high, 04. low, 05. price, 06. volume, 07. latest trading day, 08. previous close, 09. change, 10. change percent}}
+      const price = data['Global Quote']
+        ? // ex. 100.00 vs 100.00175
+          parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
+        : false
       if (price) {
         this.props.purchaseStock(this.props.user.id, price, ticker, shares)
         alert('Bought!')
-      } else alert('Please enter valid ticker.')
+      } else
+        alert('Please enter valid ticker or wait a minute (API calls reached).')
     }
-    this.props.getPortfolio()
     this.props.getUser()
+    this.props.getPortfolio()
+    this.setState({update: true})
+  }
+
+  async handlePrice(ticker) {
+    const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${
+      keys[rdmIdx]
+    }`
+    const {data} = await axios.get(url)
+
+    const daily = data['Time Series (Daily)']['2020-05-29']
+    const obj = {ticker: {open: daily['1. open'], close: daily['4. close']}}
+    this.setState({stockInfo: obj})
+  }
+
+  handleValue(sym) {
+    this.setState({ticker: sym})
   }
 
   render() {
@@ -99,7 +116,7 @@ class Portfolio extends Component {
       <div>
         <div className="content-container">
           <div className="left">
-            <h2>Portfolio ( - )</h2>
+            <h2>{user.name}'s Portfolio ( - )</h2>
             {portfolio && portfolio.length > 0 ? (
               portfolio.map((stock, i) => (
                 <Card className="stock" key={i}>
@@ -121,13 +138,15 @@ class Portfolio extends Component {
                         <Card.Title>{stock.ticker}</Card.Title>
                         <Card.Subtitle>{stock.shares} shares</Card.Subtitle>
                       </div>
-                      <Card.Title>$ - </Card.Title>
+                      <Card.Title>▴▾$ - </Card.Title>
                     </div>
                   </Card.Body>
                 </Card>
               ))
             ) : (
-              <h2>You did not purchase any stocks.</h2>
+              <h2>
+                You did not purchase any stocks. Please check the transactions.
+              </h2>
             )}
           </div>
           <div className="vert-line" />
@@ -161,6 +180,7 @@ class Portfolio extends Component {
             <div className="input-container">
               <input
                 className="search-input"
+                type="text"
                 placeholder="TICKER"
                 value={value}
                 onChange={this.handleChange}
@@ -172,16 +192,23 @@ class Portfolio extends Component {
                       <div
                         key={i}
                         className="stock-item"
-                        onClick={this.handleClick}
+                        onClick={this.handleValue}
                       >
-                        <p>{stock['2. name']}</p>
-                        <p>{stock['1. symbol']}</p>
+                        <p className="stock-name">{stock['2. name']}</p>
+                        <p className="stock-sym">{stock['1. symbol']}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
                 <div />
+              )}
+              {stocks && stocks.length > 0 ? (
+                <p />
+              ) : (
+                <p className="warning">
+                  If empty, please try again in a minute. API calls reached.
+                </p>
               )}
             </div>
           </div>
