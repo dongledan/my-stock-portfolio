@@ -28,12 +28,15 @@ h2 {
 
 button {
   margin: 10px 20px;
-  font-size: 18px;
+  font-size: 20px;
   color: #fff;
   padding: 10px 15px;
-  border-radius: 5px;
+  font-weight: bold;
 }
 
+p {
+  text-align: center;
+}
 /* Login */
 .auth-container {
   border: 1px solid #000;
@@ -113,7 +116,6 @@ label {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding-top: 10px;
 }
 
 .input-container {
@@ -124,13 +126,15 @@ label {
 }
 
 .input-container input {
-  margin: 10px 20px;
+  margin: 5px 20px;
+  padding: 5px 0;
   font-size: 18px;
   text-align: center;
 }
 
 .input-container button {
   background-color: #1ac567;
+  margin: 0 20px;
 }
 
 .autocomplete {
@@ -141,22 +145,37 @@ label {
 
 .autocomplete-items {
   position: absolute;
-  background-color: #fff;
   top: 100%;
   height: auto;
   left: 0;
   right: 0;
-  width: 87.5%;
-  margin: 0 20px;
+  margin: 5px 20px;
   z-index: 99;
 }
 
 .stock-item {
-  border-bottom: 1px solid #d4d4d4;
+  border: 1px solid #d4d4d4;
 }
 
 .stock-item:hover {
   background-color: #e9e9e9;
+  cursor: pointer;
+}
+
+.warning {
+  color: #888;
+}
+
+.stock-item p {
+  margin: 5px 0;
+}
+
+.stock-item .stock-name {
+  font-size: 12px;
+}
+
+.stock-item .stock-sym {
+  font-weight: bold;
 }
 
 /* Transactions */

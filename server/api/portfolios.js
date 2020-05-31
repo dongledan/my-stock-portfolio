@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const {Portfolio, Transaction} = require('../db/models')
+const {Portfolio} = require('../db/models')
 const {isUser, isAdmin, isCorrectUserOrAdmin} = require('./utils')
 module.exports = router
 

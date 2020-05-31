@@ -10,8 +10,7 @@ const PURCHASE_STOCK = 'PURCHASE_STOCK'
  * INITIAL STATE
  */
 const trxState = {
-  trxHistory: [],
-  port: []
+  trxHistory: []
 }
 
 /**
@@ -49,7 +48,7 @@ export const purchaseStockThunk = (userId, price, ticker, shares) => {
         action: 'BUY'
       }
       const order = await axios.post('/api/transactions', purchaseInfo)
-      await axios.post('/api/portfolios', {userId, ticker, shares})
+      if (order) await axios.post('/api/portfolios', {userId, ticker, shares})
       dispatch(purchaseStock(order.data))
     } catch (error) {
       console.error(error)

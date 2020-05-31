@@ -37,7 +37,10 @@ const User = db.define('user', {
   balance: {
     type: Sequelize.INTEGER,
     allowNull: false,
-    defaultValue: 500000
+    defaultValue: 500000,
+    validate: {
+      min: 0
+    }
   },
   googleId: {
     type: Sequelize.STRING
@@ -66,6 +69,20 @@ User.encryptPassword = function(plainText, salt) {
     .update(plainText)
     .update(salt)
     .digest('hex')
+}
+
+// decrease amount of balance, must be able to afford stock else return false
+User.buyStock = async function(userId, price, shares) {
+  const user = await User.findOne({
+    where: {
+      id: userId
+    }
+  })
+  if (user.balance >= price * shares) {
+    await user.decrement({balance: price * shares})
+    return user
+  }
+  return false
 }
 
 /**

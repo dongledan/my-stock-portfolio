@@ -23,21 +23,20 @@ router.post('/', async (req, res, next) => {
   try {
     const userId = req.user.id
     const {purchaseDate, price, shares, action, ticker} = req.body
-    const data = await Transaction.create({
-      userId,
-      purchaseDate,
-      price,
-      shares,
-      action,
-      ticker
-    })
-    const user = await User.findOne({
-      where: {
-        id: userId
-      }
-    })
-    if (user) await user.decrement({balance: price * shares})
-    res.json(data)
+
+    // class Method to buy stock & make sure enough balance to buy stock
+    const enoughBalance = await User.buyStock(userId, price, shares)
+    if (enoughBalance) {
+      const data = await Transaction.create({
+        userId,
+        purchaseDate,
+        price,
+        shares,
+        action,
+        ticker
+      })
+      res.json(data)
+    } else res.sendStatus(400)
   } catch (error) {
     next(error)
   }

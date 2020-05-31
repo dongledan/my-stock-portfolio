@@ -4,7 +4,6 @@ const db = require('../db')
 const Portfolio = db.define('portfolio', {
   ticker: {
     type: Sequelize.STRING,
-    unique: true,
     allowNull: false
   },
   shares: {
