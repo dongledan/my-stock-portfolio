@@ -6,6 +6,8 @@ import {purchaseStockThunk, getPortThunk, me} from '../store'
 
 import {keys} from '../../public/constants'
 
+const rdmIdx = Math.floor(Math.random() * 10)
+
 class Portfolio extends Component {
   constructor() {
     super()
@@ -15,7 +17,7 @@ class Portfolio extends Component {
       ticker: '',
       shares: 0,
       update: false,
-      portfolio: {},
+      portfolioStocks: {},
       portfolioVal: 0
     }
     this.handleClick = this.handleClick.bind(this)
@@ -26,11 +28,29 @@ class Portfolio extends Component {
   componentDidMount() {
     this.props.getPortfolio()
     this.props.getUser()
-    // this.setState({portfolio: this.props.portfolio})
-    // const portfolioVal = 0;
-    // this.props.portfolio.map((stock, i) => (
-
-    // ))
+    let prev = {}
+    let portfolioVal = 0
+    this.props.portfolio.map(async (stock, i) => {
+      const ticker = stock.ticker
+      const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${
+        keys[rdmIdx]
+      }`
+      const {data} = await axios.get(url)
+      const price =
+        parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
+      const change = parseFloat(data['Global Quote']['09. change'])
+      if (!price || !change) return
+      // object of stock - price & percentChange (to determine if current price is higher/lower than opening)
+      const stockInfo = {
+        price,
+        change
+      }
+      // adding value of stock to portfolio value
+      portfolioVal += price * stock.shares
+      if (!prev[ticker]) prev[ticker] = stockInfo
+      this.setState({portfolioVal})
+    })
+    this.setState({portfolioStocks: prev})
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -53,7 +73,6 @@ class Portfolio extends Component {
       value: value.toUpperCase()
     })
     // multiple api keys to avoid hitting API call limit (5 per minute)
-    const rdmIdx = Math.floor(Math.random() * 10)
     const url = `https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${value}&apikey=${
       keys[rdmIdx]
     }`
@@ -66,7 +85,7 @@ class Portfolio extends Component {
   }
 
   async handleClick() {
-    const {shares, ticker, stock} = this.state
+    const {shares, ticker} = this.state
     if (ticker.length < 1 || shares <= 0) {
       alert('Please enter valid ticker and/or purchase 1 or more shares.')
       return
@@ -110,13 +129,24 @@ class Portfolio extends Component {
   }
 
   render() {
-    const {stocks, value, shares, ticker, price} = this.state
+    const {
+      stocks,
+      value,
+      shares,
+      ticker,
+      portfolioStocks,
+      portfolioVal
+    } = this.state
     const {user, portfolio} = this.props
     return (
       <div>
         <div className="content-container">
           <div className="left">
-            <h2>{user.name}'s Portfolio ( - )</h2>
+            <h2>
+              {user.name}'s Portfolio ${portfolioVal
+                ? portfolioVal / 100
+                : '( - )'}
+            </h2>
             {portfolio && portfolio.length > 0 ? (
               portfolio.map((stock, i) => (
                 <Card className="stock" key={i}>
@@ -138,7 +168,29 @@ class Portfolio extends Component {
                         <Card.Title>{stock.ticker}</Card.Title>
                         <Card.Subtitle>{stock.shares} shares</Card.Subtitle>
                       </div>
-                      <Card.Title>▴▾$ - </Card.Title>
+                      <Card.Title>
+                        <div
+                          style={{
+                            color: `${
+                              portfolioStocks[stock.ticker] &&
+                              portfolioStocks[stock.ticker].change > 0
+                                ? '#1ac567'
+                                : '#ff333a'
+                            }`
+                          }}
+                        >
+                          {`${
+                            portfolioStocks[stock.ticker] &&
+                            portfolioStocks[stock.ticker].change > 0
+                              ? '▴'
+                              : '▾'
+                          }`}{' '}
+                          $
+                          {portfolioStocks[stock.ticker]
+                            ? portfolioStocks[stock.ticker].price / 100
+                            : '-'}
+                        </div>
+                      </Card.Title>
                     </div>
                   </Card.Body>
                 </Card>
