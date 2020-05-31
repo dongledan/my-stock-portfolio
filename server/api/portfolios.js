@@ -1,17 +1,7 @@
 const router = require('express').Router()
-const {Portfolio, Transaction} = require('../db/models')
+const {Portfolio} = require('../db/models')
 const {isUser, isAdmin, isCorrectUserOrAdmin} = require('./utils')
 module.exports = router
-
-// find all portfolios only if admin
-router.get('/all', isAdmin, async (req, res, next) => {
-  try {
-    const portfolio = await Portfolio.findAll()
-    res.json(portfolio)
-  } catch (err) {
-    next(err)
-  }
-})
 
 // find portfolio by userId
 router.get('/', async (req, res, next) => {
@@ -28,10 +18,21 @@ router.get('/', async (req, res, next) => {
   }
 })
 
+// find all portfolios only if admin
+router.get('/all', isAdmin, async (req, res, next) => {
+  try {
+    const portfolio = await Portfolio.findAll()
+    res.json(portfolio)
+  } catch (err) {
+    next(err)
+  }
+})
+
 // check to see if stock exists, if not create new
 router.post('/', async (req, res, next) => {
   try {
-    const {userId, ticker, shares} = req.body
+    const userId = req.user.id
+    const {ticker, shares} = req.body
     let stock = await Portfolio.findStock(userId, ticker)
     if (stock) {
       await stock.increment(['shares'], {by: shares})
