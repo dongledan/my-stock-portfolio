@@ -8,5 +8,20 @@ export const keys = [
   'PQEC9C7770HVOE2N',
   'RTWOC6TOAJZ0V4IK',
   'FSTBF9VCIJBINAW4',
-  'V8IF0IE0PXKD2RCI'
+  'V8IF0IE0PXKD2RCI',
+  'NUO5GSC6P498HMSR',
+  'VQ71NAMSTEA6O070',
+  'RMZ79NV7NLDIW9E9'
 ]
+
+export const formatDate = function() {
+  let d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear()
+
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  return [year, month, day].join('-')
+}

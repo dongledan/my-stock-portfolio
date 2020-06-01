@@ -21,7 +21,8 @@ form div {
   display: inline-block;
 }
 
-h2 {
+h2,
+h5 {
   padding: 20px 0;
   text-align: center;
 }
