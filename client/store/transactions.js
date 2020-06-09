@@ -1,4 +1,5 @@
 import axios from 'axios'
+import {formatTime} from '../../public/constants'
 
 /**
  * ACTION TYPES
@@ -41,7 +42,7 @@ export const purchaseStockThunk = (userId, price, ticker, shares) => {
     try {
       const purchaseInfo = {
         id: userId,
-        purchaseDate: Date(),
+        purchaseDate: formatTime(),
         price,
         ticker,
         shares,

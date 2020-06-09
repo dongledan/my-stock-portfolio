@@ -14,6 +14,7 @@ export const keys = [
   'RMZ79NV7NLDIW9E9'
 ]
 
+// used for API calls yyyy-mm-dd
 export const formatDate = function() {
   let d = new Date(),
     month = '' + (d.getMonth() + 1),
@@ -24,4 +25,21 @@ export const formatDate = function() {
   if (day.length < 2) day = '0' + day
 
   return [year, month, day].join('-')
+}
+
+// mm-dd-yyyy @ hh-mm
+export const formatTime = function() {
+  let d = new Date(),
+    month = '' + (d.getMonth() + 1),
+    day = '' + d.getDate(),
+    year = d.getFullYear(),
+    hour = d.getHours(),
+    min = d.getMinutes()
+
+  if (month.length < 2) month = '0' + month
+  if (day.length < 2) day = '0' + day
+
+  const date = [month, day, year].join('-')
+  const time = [hour, min].join(':')
+  return [date, time].join(' @ ')
 }

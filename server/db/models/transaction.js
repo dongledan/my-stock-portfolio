@@ -3,7 +3,7 @@ const db = require('../db')
 
 const Transaction = db.define('transaction', {
   purchaseDate: {
-    type: Sequelize.DATE
+    type: Sequelize.STRING
   },
   ticker: {
     type: Sequelize.STRING,

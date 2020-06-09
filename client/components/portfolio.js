@@ -34,6 +34,8 @@ class Portfolio extends Component {
       const ticker = stock.ticker
       let url = ''
       const urlRdmIdx = Math.floor(Math.random() * url.length)
+
+      // different api call links to decrease chance of hitting limit
       if (urlRdmIdx === 0)
         url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${
           keys[rdmIdx]
@@ -46,6 +48,8 @@ class Portfolio extends Component {
         url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${ticker}&apikey=${
           keys[rdmIdx]
         }`
+
+      // date in yyyy-mm-dd format for url link
       const date = formatDate()
       const {data} = await axios.get(url)
       const price =
@@ -129,7 +133,12 @@ class Portfolio extends Component {
           parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
         : false
       if (price) {
-        this.props.purchaseStock(this.props.user.id, price, ticker, shares)
+        this.props.purchaseStock(
+          this.props.user.id,
+          price.toFixed(0),
+          ticker,
+          shares
+        )
         alert('Bought!')
       } else
         alert('Please enter valid ticker or wait a minute (API calls reached).')
@@ -179,13 +188,15 @@ class Portfolio extends Component {
     return (
       <div>
         <h1 style={{textAlign: 'center'}}>
-          Total Value: ${(portfolioVal + user.balance) / 100}
+          Total Value: ${portfolioVal
+            ? (portfolioVal + user.balance) / 100
+            : '( - )'}
         </h1>
         <div className="content-container">
           <div className="left">
             <h5>
               {user.name}'s Portfolio: ${portfolioVal
-                ? portfolioVal / 100
+                ? parseFloat(portfolioVal / 100).toFixed(2)
                 : '( - )'}
             </h5>
             {portfolio && portfolio.length > 0 ? (
