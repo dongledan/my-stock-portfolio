@@ -4,9 +4,9 @@ import axios from 'axios'
 import {Card} from 'react-bootstrap'
 import {purchaseStockThunk, getPortThunk, me} from '../store'
 
-import {keys} from '../../public/constants'
+import {keys, formatDate} from '../../public/constants'
 
-const rdmIdx = Math.floor(Math.random() * 10)
+const rdmIdx = Math.floor(Math.random() * keys.length)
 
 class Portfolio extends Component {
   constructor() {
@@ -32,13 +32,43 @@ class Portfolio extends Component {
     let portfolioVal = 0
     this.props.portfolio.map(async (stock, i) => {
       const ticker = stock.ticker
-      const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${
-        keys[rdmIdx]
-      }`
+      let url = ''
+      const urlRdmIdx = Math.floor(Math.random() * url.length)
+
+      // different api call links to decrease chance of hitting limit
+      if (urlRdmIdx === 0)
+        url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${
+          keys[rdmIdx]
+        }`
+      else if (urlRdmIdx === 1)
+        url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${ticker}&apikey=${
+          keys[rdmIdx]
+        }`
+      else
+        url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${ticker}&apikey=${
+          keys[rdmIdx]
+        }`
+
+      // date in yyyy-mm-dd format for url link
+      const date = formatDate()
       const {data} = await axios.get(url)
       const price =
-        parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
-      const change = parseFloat(data['Global Quote']['09. change'])
+        urlRdmIdx === 0
+          ? parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
+          : parseFloat(data['Time Series (Daily)'][date]['4. close']).toFixed(
+              2
+            ) * 100
+      let dailyChange = 0
+      if (urlRdmIdx !== 0)
+        dailyChange =
+          parseFloat(data['Time Series (Daily)'][date]['4. close']).toFixed(2) *
+            100 -
+          parseFloat(data['Time Series (Daily)'][date]['1. open']).toFixed(2) *
+            100
+      const change =
+        urlRdmIdx === 0
+          ? parseFloat(data['Global Quote']['09. change'])
+          : dailyChange
       if (!price || !change) return
       // object of stock - price & percentChange (to determine if current price is higher/lower than opening)
       const stockInfo = {
@@ -103,7 +133,12 @@ class Portfolio extends Component {
           parseFloat(data['Global Quote']['05. price']).toFixed(2) * 100
         : false
       if (price) {
-        this.props.purchaseStock(this.props.user.id, price, ticker, shares)
+        this.props.purchaseStock(
+          this.props.user.id,
+          price.toFixed(0),
+          ticker,
+          shares
+        )
         alert('Bought!')
       } else
         alert('Please enter valid ticker or wait a minute (API calls reached).')
@@ -128,6 +163,18 @@ class Portfolio extends Component {
     this.setState({ticker: sym})
   }
 
+  handleColor(change) {
+    if (change > 0) return '#1ac567'
+    else if (change < 0) return '#ff333a'
+    else return '#888'
+  }
+
+  handleSym(change) {
+    if (change > 0) return '▴'
+    else if (change < 0) return '▾'
+    else return ''
+  }
+
   render() {
     const {
       stocks,
@@ -141,15 +188,17 @@ class Portfolio extends Component {
     return (
       <div>
         <h1 style={{textAlign: 'center'}}>
-          Total Value: ${(portfolioVal + user.balance) / 100}
+          Total Value: ${portfolioVal
+            ? (portfolioVal + user.balance) / 100
+            : '( - )'}
         </h1>
         <div className="content-container">
           <div className="left">
-            <h2>
-              {user.name}'s Portfolio ${portfolioVal
-                ? portfolioVal / 100
+            <h5>
+              {user.name}'s Portfolio: ${portfolioVal
+                ? parseFloat(portfolioVal / 100).toFixed(2)
                 : '( - )'}
-            </h2>
+            </h5>
             {portfolio && portfolio.length > 0 ? (
               portfolio.map((stock, i) => (
                 <Card className="stock" key={i}>
@@ -175,18 +224,20 @@ class Portfolio extends Component {
                         <div
                           style={{
                             color: `${
-                              portfolioStocks[stock.ticker] &&
-                              portfolioStocks[stock.ticker].change > 0
-                                ? '#1ac567'
-                                : '#ff333a'
+                              portfolioStocks[stock.ticker]
+                                ? this.handleColor(
+                                    portfolioStocks[stock.ticker].change
+                                  )
+                                : '#888'
                             }`
                           }}
                         >
                           {`${
-                            portfolioStocks[stock.ticker] &&
-                            portfolioStocks[stock.ticker].change > 0
-                              ? '▴'
-                              : '▾'
+                            portfolioStocks[stock.ticker]
+                              ? this.handleSym(
+                                  portfolioStocks[stock.ticker].change
+                                )
+                              : ''
                           }`}{' '}
                           $
                           {portfolioStocks[stock.ticker]
@@ -206,7 +257,7 @@ class Portfolio extends Component {
           </div>
           <div className="vert-line" />
           <div className="right">
-            <h2>Cash - ${user.balance / 100}</h2>
+            <h5>Buying Power: ${user.balance / 100}</h5>
             <div className="input-container">
               <input
                 className="search-input"
@@ -231,7 +282,7 @@ class Portfolio extends Component {
           </div>
           <div className="vert-line" />
           <div className="right">
-            <h2>Search Ticker</h2>
+            <h5>Search Ticker</h5>
             <div className="input-container">
               <input
                 className="search-input"
