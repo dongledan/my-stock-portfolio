@@ -3,11 +3,9 @@
 A fullstack web-based stock portfolio app for users starting off with $5000 to buy and track their stock investments in real time.
 
 ### Backend
-* PostgreSQL
-* Express
+* PostgreSQL & Express & Sequelize
 ### Frontend
-* React
-* Boostrap
+* React & Bootstrap
 ### API
 * [Alpha Vantage API](https://www.alphavantage.co/)
 
